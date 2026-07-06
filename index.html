@@ -5,16 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Thomas and Rainkie Wedding</title>
 <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  margin: 0;
-  padding: 20px;
-  min-height: 100vh;
   background: #fdfaf5;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.landing {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
 }
+
 .card {
   width: 100%;
   max-width: 400px;
@@ -24,37 +30,44 @@ body {
   box-shadow: 0 10px 40px rgba(180,80,80,0.12);
   text-align: center;
 }
+
 .title {
   font-size: 32px;
   color: #b85a53;
   margin: 0 0 8px;
 }
+
 .subtitle {
   font-size: 18px;
   color: #d4756e;
   font-style: italic;
   margin: 0 0 8px;
 }
+
 .chinese {
   font-size: 15px;
   color: #4f6b4f;
   margin: 0 0 24px;
 }
+
 .divider {
   border: none;
   border-top: 1px solid #f0d0cc;
   margin: 20px 0;
 }
+
 .instruction {
   font-size: 14px;
   color: #666;
   margin: 0 0 6px;
 }
+
 .instruction-cn {
   font-size: 14px;
   color: #6b8f6b;
   margin: 0 0 24px;
 }
+
 .btn {
   display: block;
   width: 100%;
@@ -66,36 +79,100 @@ body {
   font-weight: bold;
   text-decoration: none;
   margin-bottom: 16px;
+  border: none;
+  cursor: pointer;
 }
+
 .hint {
   font-size: 12px;
   color: #aaa;
   line-height: 1.6;
 }
+
 .footer {
   margin-top: 24px;
   font-size: 13px;
   color: #ccc;
   font-style: italic;
 }
+
+/* Upload iframe view */
+.upload-view {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #fdfaf5;
+  z-index: 999;
+}
+
+.upload-view iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.back-btn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #f0d0cc;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #b85a53;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
-<div class="card">
-  <p class="title">Thomas & Rainkie</p>
-  <p class="subtitle">Share a Memory</p>
-  <p class="chinese">分享美好回憶 💕</p>
-  <hr class="divider">
-  <p class="instruction">Tap below to upload your photos</p>
-  <p class="instruction-cn">點擊下方上載你的照片 📷</p>
-  <a href="https://tinyurl.com/ThomasnRainkie" class="btn">
-    📷 Upload Photos · 上載照片
-  </a>
-  <p class="hint">
-    iPhone users: please open in Chrome<br>
-    iPhone用戶：請用Chrome開啟
-  </p>
-  <p class="footer">with love · 愛你們 ✦</p>
+
+<!-- Landing page -->
+<div class="landing" id="landing">
+  <div class="card">
+    <p class="title">Thomas & Rainkie</p>
+    <p class="subtitle">Share a Memory</p>
+    <p class="chinese">分享美好回憶 💕</p>
+    <hr class="divider">
+    <p class="instruction">Tap below to upload your photos</p>
+    <p class="instruction-cn">點擊下方上載你的照片 📷</p>
+    <button class="btn" onclick="openUpload()">
+      📷 Upload Photos · 上載照片
+    </button>
+    <p class="hint">
+      Works on all phones and browsers<br>
+      支援所有手機及瀏覽器
+    </p>
+    <p class="footer">with love ✦</p>
+  </div>
 </div>
+
+<!-- Upload iframe -->
+<div class="upload-view" id="uploadView">
+  <button class="back-btn" onclick="goBack()">← Back</button>
+  <iframe
+    id="uploadFrame"
+    src=""
+    allow="camera; microphone"
+  ></iframe>
+</div>
+
+<script>
+function openUpload() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('uploadView').style.display = 'block';
+  document.getElementById('uploadFrame').src =
+    'https://script.google.com/macros/s/AKfycbypYhy8F2sp-RvqxKf2asOvc2ezxXMIqJlIKZRL6y7k7UUxthOArzDIomlfY53Ic8KI/exec';
+}
+
+function goBack() {
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('uploadView').style.display = 'none';
+  document.getElementById('uploadFrame').src = '';
+}
+</script>
+
 </body>
 </html>
