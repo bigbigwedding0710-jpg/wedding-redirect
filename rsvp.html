@@ -1,50 +1,663 @@
-var SHEET_ID = 'https://docs.google.com/spreadsheets/d/10TefO44Ae7dL9o4J6BN4T2hyYEqgU6IR-UdrloKhuqY/edit';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>吳梁聯婚 — RSVP</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500&display=swap');
 
-function doGet(e) {
-  try {
-    var data = e.parameter;
-    if (!data || !data.name) {
-      return ContentService
-        .createTextOutput('ok')
-        .setMimeType(ContentService.MimeType.TEXT);
-    }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    var ss = SpreadsheetApp.openById(SHEET_ID);
-    var sheet = ss.getSheets()[0];
+html, body {
+  background: #fdfaf5;
+  font-family: 'DM Sans', sans-serif;
+  color: #4a4a4a;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        'Timestamp 時間',
-        'Name 姓名',
-        'Attending 出席',
-        'Side 男家/女家',
-        'Additional Guests 同行人數',
-        'Guest Names 同行姓名',
-        'Message 留言'
-      ]);
-      var headerRange = sheet.getRange(1, 1, 1, 7);
-      headerRange.setBackground('#d4756e');
-      headerRange.setFontColor('#ffffff');
-      headerRange.setFontWeight('bold');
-    }
+.bg-decor {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-decor-1 {
+  top: -120px; right: -120px;
+  width: 320px; height: 320px;
+  background: rgba(232,165,160,0.12);
+}
+.bg-decor-2 {
+  bottom: -100px; left: -100px;
+  width: 280px; height: 280px;
+  background: rgba(138,171,138,0.10);
+}
 
-    sheet.appendRow([
-      new Date(),
-      data.name        || '',
-      data.attending   || '',
-      data.side        || '',
-      data.guestCount  || '0',
-      data.guestNames  || '',
-      data.message     || ''
-    ]);
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px 60px;
+}
 
-    return ContentService
-      .createTextOutput('ok')
-      .setMimeType(ContentService.MimeType.TEXT);
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid #f0e0c0;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(184,90,83,0.12);
+  overflow: hidden;
+  animation: fadeUp 0.5s ease forwards;
+}
 
-  } catch(err) {
-    return ContentService
-      .createTextOutput('error: ' + err.message)
-      .setMimeType(ContentService.MimeType.TEXT);
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+  background: linear-gradient(135deg, rgba(232,165,160,0.18), rgba(138,171,138,0.10));
+  padding: 36px 24px 24px;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 400;
+  color: #b85a53;
+  line-height: 1.1;
+}
+
+.title-cn {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: #6b8f6b;
+  margin-top: 4px;
+  letter-spacing: 4px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: rgba(232,165,160,0.4);
+}
+.divider i {
+  color: #e8a5a0;
+  font-style: normal;
+  font-size: 14px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #4f6b4f;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.card-body { padding: 24px 22px; }
+
+.field { margin-bottom: 20px; }
+
+.field label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #4f6b4f;
+  margin-bottom: 8px;
+}
+
+.required { color: #e8a5a0; }
+.optional {
+  color: #c9c2b8;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+
+.field input[type="text"],
+.field textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid #f0e0c0;
+  background: #fdfaf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: #4a4a4a;
+  outline: none;
+  resize: none;
+  -webkit-appearance: none;
+}
+
+.field input[type="text"]:focus,
+.field textarea:focus {
+  border-color: #e8a5a0;
+  box-shadow: 0 0 0 3px rgba(232,165,160,0.2);
+}
+
+.field input::placeholder,
+.field textarea::placeholder { color: #c9c2b8; }
+
+.btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.choice-btn {
+  padding: 13px 8px;
+  border-radius: 14px;
+  border: 2px solid #f0e0c0;
+  background: #fdfaf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #9a9490;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  transition: all 0.15s;
+}
+
+.choice-btn.selected {
+  border-color: #d4756e !important;
+  background: rgba(212,117,110,0.10) !important;
+  color: #b85a53 !important;
+  font-weight: 500 !important;
+}
+
+/* Guest count selector */
+.guest-count-selector {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.count-btn {
+  padding: 12px 4px;
+  border-radius: 12px;
+  border: 2px solid #f0e0c0;
+  background: #fdfaf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #9a9490;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  transition: all 0.15s;
+}
+
+.count-btn.selected {
+  border-color: #d4756e !important;
+  background: rgba(212,117,110,0.10) !important;
+  color: #b85a53 !important;
+}
+
+/* Additional guest name fields */
+.additional-guests {
+  display: none;
+  margin-top: 14px;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.additional-guests.show {
+  display: flex;
+}
+
+.guest-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guest-number {
+  font-size: 12px;
+  color: #e8a5a0;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+.guest-name-row input {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid #f0e0c0;
+  background: #fdfaf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #4a4a4a;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.guest-name-row input:focus {
+  border-color: #e8a5a0;
+  box-shadow: 0 0 0 3px rgba(232,165,160,0.2);
+}
+
+.guest-name-row input::placeholder { color: #c9c2b8; }
+
+/* Error box */
+.error-box {
+  background: #fdf0ef;
+  border: 1px solid #f5cfcb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #c05c54;
+  text-align: center;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: #d4756e;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(212,117,110,0.35);
+  -webkit-appearance: none;
+  transition: all 0.2s;
+}
+
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled {
+  background: #f0e0c0;
+  color: #c9c2b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Success */
+.success-box {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.success-icon { font-size: 48px; margin-bottom: 16px; }
+
+.success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: #6b8f6b;
+  margin-bottom: 8px;
+}
+
+.success-detail {
+  font-size: 14px;
+  color: #9a9490;
+  line-height: 1.8;
+  margin-bottom: 24px;
+  white-space: pre-line;
+  text-align: left;
+  background: #fdfaf5;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.submit-another-btn {
+  background: none;
+  border: 1px solid #f0e0c0;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #b85a53;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* Footer */
+.card-footer {
+  padding: 0 24px 28px;
+  text-align: center;
+}
+
+.footer-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #c9c2b8;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-decor bg-decor-1"></div>
+<div class="bg-decor bg-decor-2"></div>
+
+<div class="page">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <p class="title">Rainkie &amp; Thomas</p>
+      <p class="title-cn">吳梁聯婚</p>
+      <div class="divider"><span></span><i>✦</i><span></span></div>
+      <p class="subtitle">RSVP · 出席回覆</p>
+    </div>
+
+    <!-- Form -->
+    <div class="card-body" id="formView">
+
+      <!-- Your Name -->
+      <div class="field">
+        <label>Your Name · 你的姓名 <span class="required">*</span></label>
+        <input type="text" id="name"
+          placeholder="e.g. Chan Tai Man · 陳大文"
+          maxlength="50">
+      </div>
+
+      <!-- Attending -->
+      <div class="field">
+        <label>Attending? · 是否出席？ <span class="required">*</span></label>
+        <div class="btn-group">
+          <button class="choice-btn"
+            onclick="selectChoice('attending','yes',this)">
+            ✓ Yes · 出席
+          </button>
+          <button class="choice-btn"
+            onclick="selectChoice('attending','no',this)">
+            ✗ No · 不出席
+          </button>
+        </div>
+      </div>
+
+      <!-- Side -->
+      <div class="field">
+        <label>Bride or Groom side? · 男家/女家？ <span class="required">*</span></label>
+        <div class="btn-group">
+          <button class="choice-btn"
+            onclick="selectChoice('side','groom',this)">
+            🤵 Groom · 男家
+          </button>
+          <button class="choice-btn"
+            onclick="selectChoice('side','bride',this)">
+            👰 Bride · 女家
+          </button>
+        </div>
+      </div>
+
+      <!-- Additional Guests -->
+      <div class="field">
+        <label>
+          Additional guests? · 其他同行人數？
+          <span class="optional">(including family · 包括家人)</span>
+        </label>
+        <div class="guest-count-selector">
+          <button class="count-btn"
+            onclick="selectGuestCount(0, this)">
+            0
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(1, this)">
+            1
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(2, this)">
+            2
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(3, this)">
+            3
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(4, this)">
+            4
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(5, this)">
+            5
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(6, this)">
+            6
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(7, this)">
+            7
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(8, this)">
+            8
+          </button>
+          <button class="count-btn"
+            onclick="selectGuestCount(9, this)">
+            9
+          </button>
+        </div>
+
+        <!-- Dynamic name fields -->
+        <div class="additional-guests" id="additionalGuests"></div>
+      </div>
+
+      <!-- Message -->
+      <div class="field">
+        <label>
+          Message to the couple · 給新人的話
+          <span class="optional">(optional · 可選)</span>
+        </label>
+        <textarea id="message"
+          placeholder="e.g. Congratulations! · 恭喜晒！"
+          maxlength="300" rows="3"></textarea>
+      </div>
+
+      <!-- Error -->
+      <div id="errorBox" class="error-box" style="display:none;">
+        <p id="errorMsg"></p>
+      </div>
+
+      <!-- Submit -->
+      <button id="submitBtn" class="submit-btn" onclick="submitForm()">
+        Send RSVP · 提交回覆 💕
+      </button>
+
+    </div>
+
+    <!-- Success View -->
+    <div class="card-body" id="successView" style="display:none;">
+      <div class="success-box">
+        <p class="success-icon">💕</p>
+        <p class="success-title">Thank you! · 多謝！</p>
+        <p class="success-detail" id="successDetail"></p>
+        <button class="submit-another-btn" onclick="submitAnother()">
+          Submit another · 再提交一份
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="divider"><span></span><i>✦</i><span></span></div>
+      <p class="footer-text">with love✦</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Your Apps Script URL ──
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztgFC9Jd5mkrLs92X2fsD5RIi6QyuQhtv0dhaDg9HduAaN9AsMaQT61bB2k5mUI5Pz/exec';
+
+// ── State ──
+var choices = {
+  attending: '',
+  side: '',
+  guestCount: -1  // -1 means not selected
+};
+
+// ── Select attending / side buttons ──
+function selectChoice(field, value, btn) {
+  choices[field] = value;
+
+  var group = btn.parentElement;
+  group.querySelectorAll('.choice-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
+  btn.classList.add('selected');
+}
+
+// ── Select number of additional guests ──
+function selectGuestCount(count, btn) {
+  choices.guestCount = count;
+
+  // Highlight selected count button
+  document.querySelectorAll('.count-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
+  btn.classList.add('selected');
+
+  // Build name input fields
+  var container = document.getElementById('additionalGuests');
+  container.innerHTML = '';
+
+  if (count === 0) {
+    container.classList.remove('show');
+    return;
+  }
+
+  container.classList.add('show');
+
+  for (var i = 1; i <= count; i++) {
+    var row = document.createElement('div');
+    row.className = 'guest-name-row';
+    row.innerHTML =
+      '<span class="guest-number">✦' + i + '</span>' +
+      '<input type="text" ' +
+        'id="guestName' + i + '" ' +
+        'placeholder="Guest ' + i + ' name · 第' + i + '位姓名" ' +
+        'maxlength="50">';
+    container.appendChild(row);
   }
 }
+
+// ── Submit form ──
+function submitForm() {
+  var name     = document.getElementById('name').value.trim();
+  var message  = document.getElementById('message').value.trim();
+  var errorBox = document.getElementById('errorBox');
+  var errorMsg = document.getElementById('errorMsg');
+
+  // Validation
+  if (!name) {
+    errorMsg.textContent = 'Please enter your name · 請輸入你的姓名';
+    errorBox.style.display = 'block';
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (!choices.attending) {
+    errorMsg.textContent = 'Please select if you are attending · 請選擇是否出席';
+    errorBox.style.display = 'block';
+    return;
+  }
+  if (!choices.side) {
+    errorMsg.textContent = 'Please select Bride or Groom side · 請選擇男家或女家';
+    errorBox.style.display = 'block';
+    return;
+  }
+  if (choices.guestCount === -1) {
+    errorMsg.textContent = 'Please select number of additional guests · 請選擇同行人數 (select 0 if none · 沒有請選0)';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  errorBox.style.display = 'none';
+
+  // Collect additional guest names
+  var guestNames = [];
+  for (var i = 1; i <= choices.guestCount; i++) {
+    var guestInput = document.getElementById('guestName' + i);
+    var guestName = guestInput ? guestInput.value.trim() : '';
+    guestNames.push(guestName || '(no name)');
+  }
+
+  // Disable button
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting · 提交中...';
+
+  // Build params
+  var params = new URLSearchParams({
+    name:        name,
+    attending:   choices.attending === 'yes' ? 'Yes · 出席' : 'No · 不出席',
+    side:        choices.side === 'groom' ? 'Groom · 男家' : 'Bride · 女家',
+    guestCount:  choices.guestCount,
+    guestNames:  guestNames.join(', '),
+    message:     message
+  });
+
+  // Send using image trick — works on Safari, no CORS!
+  var img = new Image();
+  img.onload  = function() { showSuccess(name, guestNames); };
+  img.onerror = function() { showSuccess(name, guestNames); };
+  img.src = SCRIPT_URL + '?' + params.toString();
+}
+
+// ── Show success screen ──
+function showSuccess(name, guestNames) {
+  document.getElementById('formView').style.display = 'none';
+  document.getElementById('successView').style.display = 'block';
+
+  var attending = choices.attending === 'yes' ? 'Yes · 出席 ✓' : 'No · 不出席 ✗';
+  var side      = choices.side === 'groom' ? 'Groom · 男家' : 'Bride · 女家';
+
+  var detail =
+    '👤 ' + name + '\n' +
+    '✦ Attending · 出席: ' + attending + '\n' +
+    '✦ Side · 男家/女家: ' + side + '\n' +
+    '✦ Additional guests · 同行人數: ' + choices.guestCount;
+
+  if (guestNames.length > 0) {
+    guestNames.forEach(function(n, i) {
+      detail += '\n   ' + (i + 1) + '. ' + n;
+    });
+  }
+
+  document.getElementById('successDetail').innerText = detail;
+}
+
+// ── Reset form ──
+function submitAnother() {
+  document.getElementById('name').value = '';
+  document.getElementById('message').value = '';
+  document.getElementById('additionalGuests').innerHTML = '';
+  document.getElementById('additionalGuests').classList.remove('show');
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('successView').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.textContent = 'Send RSVP · 提交回覆 💕';
+
+  document.querySelectorAll('.choice-btn, .count-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
+
+  choices = { attending: '', side: '', guestCount: -1 };
+}
+</script>
+
+</body>
+</html>
