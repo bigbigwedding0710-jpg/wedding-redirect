@@ -470,4 +470,32 @@ function showSuccess(data) {
     'Side · ' + (formData.side === 'groom' ? '男家 Groom' : '女家 Bride');
 
   if (formData.plusOne === 'yes' && data.plusOneName) {
-    detail +=
+    detail += '\nPlus One · 伴侶: ' + data.plusOneName;
+  }
+
+  document.getElementById('successDetail').innerText = detail;
+}
+
+function submitAnother() {
+  document.getElementById('name').value = '';
+  document.getElementById('message').value = '';
+  document.getElementById('plusOneName').value = '';
+  document.getElementById('plusOneNameField').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('successView').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.textContent = 'Send RSVP · 提交回覆 💕';
+
+  document.querySelectorAll('.choice-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
+
+  formData = { attending: '', side: '', plusOne: '' };
+}
+</script>
+
+</body>
+</html>
