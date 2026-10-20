@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Check-in 簽到</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #fdfaf5;
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  color: #4a4a4a;
+  padding-bottom: 170px;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font-family: inherit; -webkit-appearance: none; cursor: pointer; }
+
+/* PIN screen */
+.pin { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.pin .card { background: #fff; border: 1px solid #f0e0c0; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(184,90,83,.12); }
+.pin h2 { color: #b85a53; margin-bottom: 6px; }
+.pin p { font-size: 13px; color: #9a9490; margin-bottom: 16px; }
+.pin input { width: 100%; padding: 14px; font-size: 20px; text-align: center; border: 1px solid #f0e0c0; border-radius: 12px; margin-bottom: 12px; background: #fdfaf5; }
+.pin button { width: 100%; padding: 14px; border: none; border-radius: 12px; background: #d4756e; color: #fff; font-size: 16px; font-weight: 600; }
+#pinErr { color: #c05c54; margin: 10px 0 0; min-height: 18px; }
+
+/* Header */
+.top { position: sticky; top: 0; z-index: 10; background: rgba(253,250,245,.97); border-bottom: 1px solid #f0e0c0; padding: 10px 14px 8px; }
+.row { display: flex; justify-content: space-between; align-items: center; }
+.row b { color: #b85a53; font-size: 17px; }
+#undoBtn { border: 1px solid #d4756e; background: #fff; color: #b85a53; border-radius: 16px; padding: 6px 14px; font-size: 13px; font-weight: 600; }
+#undoBtn:disabled { opacity: .35; }
+.stats { display: flex; justify-content: space-between; font-size: 14px; margin: 8px 0 4px; font-weight: 600; }
+#live { font-size: 11px; font-weight: 400; color: #6b8f6b; }
+#live.off { color: #c05c54; }
+.bar { height: 10px; background: #f0e0c0; border-radius: 10px; overflow: hidden; }
+#barFill { height: 100%; width: 0; background: linear-gradient(90deg, #8aab8a, #6b8f6b); transition: width .3s; }
+#search { width: 100%; margin-top: 10px; padding: 12px 14px; font-size: 16px; border: 1px solid #f0e0c0; border-radius: 12px; background: #fff; outline: none; -webkit-appearance: none; }
+#search:focus { border-color: #e8a5a0; }
+.chips { display: flex; gap: 8px; margin-top: 8px; }
+.chip { flex: 1; padding: 8px 4px; border: 1px solid #f0e0c0; background: #fff; border-radius: 10px; font-size: 12px; color: #9a9490; }
+.chip.on { border-color: #d4756e; background: rgba(212,117,110,.1); color: #b85a53; font-weight: 600; }
+
+/* List */
+.gh { display: flex; justify-content: space-between; padding: 10px 14px; background: #f9f2e4; font-weight: 700; color: #b85a53; font-size: 14px; }
+.g { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fff; border-bottom: 1px solid #f9f2e4; font-size: 17px; }
+.g .ck { width: 26px; text-align: center; font-size: 20px; color: #c9c2b8; }
+.g .nm { flex: 1; }
+.g .tm { font-size: 12px; color: #6b8f6b; }
+.g.in { background: #eaf3ea; }
+.g.in .ck { color: #4f6b4f; font-weight: 700; }
+.g.in .nm { color: #4f6b4f; }
+.g.sel { background: #fde9e7; outline: 2px solid #d4756e; outline-offset: -2px; }
+.g.sel .ck { color: #b85a53; }
+.empty { text-align: center; color: #9a9490; padding: 40px 20px; }
+
+/* Selected bar */
+.selbar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 2px solid #d4756e; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 20px rgba(0,0,0,.08); z-index: 20; }
+.sl { font-size: 15px; line-height: 1.6; margin-bottom: 10px; max-height: 110px; overflow-y: auto; }
+.sl b { color: #b85a53; font-size: 18px; }
+.btns { display: flex; gap: 8px; }
+.btns button { flex: 1; padding: 14px 6px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; }
+.go { background: #6b8f6b; color: #fff; }
+.un { background: #fff; color: #b85a53; border: 2px solid #d4756e !important; }
+.cl { background: #f0e0c0; color: #6b6560; flex: .6 !important; }
+
+/* Toast */
+#toast { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 50; background: #4f6b4f; color: #fff; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+#toast.err { background: #c05c54; }
+</style>
+</head>
+<body>
+
+<!-- PIN screen -->
+<div id="pinView" class="pin">
+  <div class="card">
+    <h2>Staff Check-in</h2>
+    <p>工作人員專用 · 請輸入PIN</p>
+    <input id="pinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN">
+    <button onclick="login()">Enter 進入</button>
+    <p id="pinErr"></p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app" style="display:none">
+  <div class="top">
+    <div class="row">
+      <b>吳梁聯婚 · 簽到</b>
+      <button id="undoBtn" onclick="undo()" disabled>↩ Undo 還原</button>
+    </div>
+    <div class="stats"><span id="statTxt">-</span><span id="live">● live</span></div>
+    <div class="bar"><div id="barFill"></div></div>
+    <input id="search" type="search" placeholder="Search name / table · 搜尋姓名或枱號" oninput="render()">
+    <div class="chips">
+      <button class="chip on" data-f="all" onclick="setFilter('all')">All 全部</button>
+      <button class="chip" data-f="todo" onclick="setFilter('todo')">未到 Not yet</button>
+      <button class="chip" data-f="done" onclick="setFilter('done')">已到 Arrived</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div id="selbar" class="selbar" style="display:none">
+    <div class="sl" id="selList"></div>
+    <div class="btns">
+      <button class="go" id="goBtn" onclick="setSel(1)">✓ Check in 到場</button>
+      <button class="un" id="unBtn" onclick="setSel(0)">✗ 取消到場</button>
+      <button class="cl" onclick="clearSel()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ▼▼▼ 貼你嘅Apps Script /exec URL ▼▼▼
+var API = 'https://script.google.com/macros/s/AKfycbxKhUs1cPdsNyDjOVbsbeyXgz0Jv-JXb1ebmbV2LEJeEvgZdnTagSMoxdLfsEB2KDNl8w/exec';
+// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+var POLL_MS = 8000;
+var pin = '';
+var guests = [];
+var byRow = {};
+var selected = {};
+var lastAction = null;
+var busy = false;
+var filter = 'all';
+var toastTimer = null;
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// ── JSONP (Safari 都work，冇CORS問題) ──
+function jsonp(params) {
+  return new Promise(function (resolve, reject) {
+    var cb = 'cb' + Date.now() + Math.floor(Math.random() * 100000);
+    var s = document.createElement('script');
+    var t = setTimeout(function () { cleanup(); reject(new Error('timeout')); }, 15000);
+    function cleanup() {
+      clearTimeout(t);
+      delete window[cb];
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[cb] = function (d) { cleanup(); resolve(d); };
+    s.onerror = function () { cleanup(); reject(new Error('network')); };
+    params.callback = cb;
+    params.pin = pin;
+    params._ = Date.now();
+    s.src = API + '?' + new URLSearchParams(params).toString();
+    document.head.appendChild(s);
+  });
+}
+
+// ── Login ──
+function login() {
+  pin = document.getElementById('pinInput').value.trim();
+  if (!pin) return;
+  document.getElementById('pinErr').textContent = '連接中 Connecting...';
+  jsonp({ action: 'list' }).then(function (d) {
+    if (!d.ok) {
+      pin = '';
+      document.getElementById('pinErr').textContent = d.error === 'PIN' ? 'PIN錯誤 Wrong PIN' : '錯誤: ' + d.error;
+      return;
+    }
+    try { localStorage.setItem('ckpin', pin); } catch (e) {}
+    document.getElementById('pinView').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    setGuests(d.guests);
+    setInterval(function () { if (!document.hidden) refresh(); }, POLL_MS);
+  }).catch(function () {
+    pin = '';
+    document.getElementById('pinErr').textContent = '連接失敗，請檢查網絡或URL';
+  });
+}
+
+function logout() {
+  try { localStorage.removeItem('ckpin'); } catch (e) {}
+  location.reload();
+}
+
+// ── Data ──
+function setGuests(list) {
+  guests = list;
+  byRow = {};
+  guests.forEach(function (g) { byRow[g.row] = g; });
+  Object.keys(selected).forEach(function (r) { if (!byRow[r]) delete selected[r]; });
+  render();
+}
+
+function refresh() {
+  if (busy || !pin) return;
+  jsonp({ action: 'list' }).then(function (d) {
+    if (busy) return;
+    if (!d.ok) { if (d.error === 'PIN') logout(); return; }
+    setGuests(d.guests);
+    setLive(true);
+  }).catch(function () { setLive(false); });
+}
+
+function setLive(ok) {
+  var el = document.getElementById('live');
+  el.textContent = ok ? '● live' : '● offline 離線';
+  el.className = ok ? '' : 'off';
+}
+
+// ── Render ──
+function render() {
+  var q = document.getElementById('search').value.trim().toLowerCase();
+  var total = guests.length;
+  var done = guests.filter(function (g) { return g.arrived; }).length;
+  var pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('statTxt').textContent = done + ' / ' + total + ' (' + pct + '%) 已到';
+  document.getElementById('barFill').style.width = pct + '%';
+
+  var ts = {};
+  guests.forEach(function (g) {
+    if (!ts[g.table]) ts[g.table] = { t: 0, d: 0 };
+    ts[g.table].t++;
+    if (g.arrived) ts[g.table].d++;
+  });
+
+  var order = [], groups = {};
+  guests.forEach(function (g) {
+    if (filter === 'todo' && g.arrived) return;
+    if (filter === 'done' && !g.arrived) return;
+    if (q && g.name.toLowerCase().indexOf(q) < 0 && g.table.toLowerCase().indexOf(q) < 0) return;
+    if (!groups[g.table]) { groups[g.table] = []; order.push(g.table); }
+    groups[g.table].push(g);
+  });
+
+  var html = '';
+  order.forEach(function (t) {
+    html += '<div class="gh"><span>' + esc(t) + '</span><span>' + ts[t].d + '/' + ts[t].t + '</span></div>';
+    groups[t].forEach(function (g) {
+      var sel = selected[g.row];
+      html += '<div class="g' + (g.arrived ? ' in' : '') + (sel ? ' sel' : '') + '" data-row="' + g.row + '">' +
+        '<span class="ck">' + (sel ? '☑' : (g.arrived ? '✓' : '○')) + '</span>' +
+        '<span class="nm">' + esc(g.name) + '</span>' +
+        '<span class="tm">' + (g.arrived ? esc(g.time) : '') + '</span></div>';
+    });
+  });
+  if (!order.length) html = '<p class="empty">找不到 No results</p>';
+  document.getElementById('list').innerHTML = html;
+  renderSelBar();
+}
+
+function renderSelBar() {
+  var rows = Object.keys(selected);
+  var bar = document.getElementById('selbar');
+  if (!rows.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  var anyOut = false, anyIn = false, html = '';
+  rows.forEach(function (r) {
+    var g = byRow[r];
+    if (!g) return;
+    if (g.arrived) anyIn = true; else anyOut = true;
+    html += esc(g.name) + ' → <b>' + esc(g.table) + '</b>' + (g.arrived ? ' ✓' : '') + '<br>';
+  });
+  document.getElementById('selList').innerHTML = html;
+  document.getElementById('goBtn').style.display = anyOut ? 'block' : 'none';
+  document.getElementById('unBtn').style.display = anyIn ? 'block' : 'none';
+}
+
+// ── Interactions ──
+document.getElementById('list').addEventListener('click', function (e) {
+  var el = e.target.closest('.g');
+  if (!el) return;
+  var r = el.getAttribute('data-row');
+  if (selected[r]) delete selected[r]; else selected[r] = true;
+  render();
+});
+
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.classList.toggle('on', c.getAttribute('data-f') === f);
+  });
+  render();
+}
+
+function clearSel() { selected = {}; render(); }
+
+function hhmm() {
+  var d = new Date();
+  return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+
+function showToast(msg, isErr) {
+  var t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = isErr ? 'err' : '';
+  t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.style.display = 'none'; }, isErr ? 4000 : 5000);
+}
+
+function updateUndo() {
+  document.getElementById('undoBtn').disabled = !lastAction;
+}
+
+function setSel(value) {
+  var rows = Object.keys(selected).filter(function (r) {
+    var g = byRow[r];
+    return g && g.arrived !== !!value;
+  });
+  selected = {};
+  if (!rows.length) { render(); return; }
+  apply(rows, value, true);
+}
+
+function undo() {
+  if (!lastAction) return;
+  var a = lastAction;
+  apply(a.rows, a.value ? 0 : 1, false, true);
+}
+
+function apply(rows, value, record, isUndo) {
+  var affected = rows.map(function (r) { return byRow[r]; }).filter(Boolean);
+  if (!affected.length) return;
+  var now = hhmm();
+  var summary = affected.map(function (g) { return esc(g.name) + ' → <b>' + esc(g.table) + '</b>'; }).join('<br>');
+  affected.forEach(function (g) { g.arrived = !!value; g.time = value ? now : ''; });
+  render();
+
+  busy = true;
+  jsonp({ action: 'set', rows: rows.join(','), value: String(value) }).then(function (d) {
+    busy = false;
+    if (!d.ok) throw new Error(d.error);
+    setGuests(d.guests);
+    setLive(true);
+    lastAction = record ? { rows: rows, value: value } : null;
+    updateUndo();
+    if (isUndo) showToast('↩ 已還原 Undone');
+    else showToast((value ? '✓ 已簽到<br>' : '✗ 已取消<br>') + summary);
+  }).catch(function () {
+    busy = false;
+    showToast('⚠️ 失敗，已重新載入 Failed, reloading', true);
+    refresh();
+  });
+}
+
+// ── Auto login ──
+(function () {
+  try {
+    var saved = localStorage.getItem('ckpin');
+    if (saved) { document.getElementById('pinInput').value = saved; login(); }
+  } catch (e) {}
+})();
+document.getElementById('pinInput').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>
