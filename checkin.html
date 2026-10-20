@@ -63,7 +63,9 @@ button { font-family: inherit; -webkit-appearance: none; cursor: pointer; }
 .go { background: #6b8f6b; color: #fff; }
 .un { background: #fff; color: #b85a53; border: 2px solid #d4756e !important; }
 .cl { background: #f0e0c0; color: #6b6560; flex: .6 !important; }
-
+.note { color: #b85a53; font-weight: 700; font-size: 14px; }
+.note-badge { font-size: 12px; margin-left: 6px; }
+.notebox { background: #fff3cd; border: 2px solid #e0a800; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: 15px; line-height: 1.6; color: #6b4e00; }
 /* Toast */
 #toast { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 50; background: #4f6b4f; color: #fff; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
 #toast.err { background: #c05c54; }
@@ -239,7 +241,7 @@ function render() {
       var sel = selected[g.row];
       html += '<div class="g' + (g.arrived ? ' in' : '') + (sel ? ' sel' : '') + '" data-row="' + g.row + '">' +
         '<span class="ck">' + (sel ? '☑' : (g.arrived ? '✓' : '○')) + '</span>' +
-        '<span class="nm">' + esc(g.name) + '</span>' +
+        '<span class="nm">' + esc(g.name) + (g.note ? '<span class="note-badge">📝</span>' : '') + '</span>' +
         '<span class="tm">' + (g.arrived ? esc(g.time) : '') + '</span></div>';
     });
   });
@@ -259,6 +261,7 @@ function renderSelBar() {
     if (!g) return;
     if (g.arrived) anyIn = true; else anyOut = true;
     html += esc(g.name) + ' → <b>' + esc(g.table) + '</b>' + (g.arrived ? ' ✓' : '') + '<br>';
+if (g.note) html += '<div class="notebox">📝 ' + esc(g.note) + '</div>';
   });
   document.getElementById('selList').innerHTML = html;
   document.getElementById('goBtn').style.display = anyOut ? 'block' : 'none';
@@ -335,7 +338,12 @@ function apply(rows, value, record, isUndo) {
     lastAction = record ? { rows: rows, value: value } : null;
     updateUndo();
     if (isUndo) showToast('↩ 已還原 Undone');
-    else showToast((value ? '✓ 已簽到<br>' : '✗ 已取消<br>') + summary);
+    else {
+  var notes = affected.filter(function (g) { return g.note; })
+    .map(function (g) { return '📝 ' + esc(g.name) + '：' + esc(g.note); }).join('<br>');
+  showToast((value ? '✓ 已簽到<br>' : '✗ 已取消<br>') + summary +
+    (value && notes ? '<br><br><b>⚠️ 提醒 Reminder</b><br>' + notes : ''), false, value && notes ? 9000 : 0);
+}
   }).catch(function () {
     busy = false;
     showToast('⚠️ 失敗，已重新載入 Failed, reloading', true);
