@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>吳梁聯婚 · Staff Hub</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #fdfaf5; font-family: -apple-system, 'Helvetica Neue', 'PingFang HK', Arial, sans-serif; color: #4a4a4a; -webkit-tap-highlight-color: transparent; }
+button, input { font-family: inherit; -webkit-appearance: none; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.view { min-height: 100vh; }
+.empty { text-align: center; color: #9a9490; padding: 40px 20px; line-height: 1.7; }
+
+/* Home */
+.hero { text-align: center; padding: 48px 20px 24px; background: linear-gradient(135deg, rgba(232,165,160,.18), rgba(138,171,138,.10)); }
+.hero .h1 { font-size: 30px; color: #b85a53; letter-spacing: 4px; }
+.hero .h2 { font-size: 13px; color: #4f6b4f; margin-top: 6px; letter-spacing: 1px; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px 16px; max-width: 520px; margin: 0 auto; }
+.tile { background: #fff; border: 1px solid #f0e0c0; border-radius: 20px; padding: 24px 8px; text-align: center; box-shadow: 0 4px 16px rgba(184,90,83,.08); display: flex; flex-direction: column; gap: 4px; }
+.tile:active { transform: scale(.97); }
+.tile .ti { font-size: 34px; }
+.tile b { color: #b85a53; font-size: 16px; }
+.tile small { color: #9a9490; font-size: 12px; }
+
+/* Header */
+.top { position: sticky; top: 0; z-index: 10; background: rgba(253,250,245,.97); border-bottom: 1px solid #f0e0c0; padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top)); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.row b { color: #b85a53; font-size: 17px; flex: 1; text-align: center; }
+.back { font-size: 15px; color: #b85a53; padding: 6px 4px; min-width: 64px; }
+.mini { border: 1px solid #d4756e; background: #fff; color: #b85a53; border-radius: 16px; padding: 6px 12px; font-size: 13px; font-weight: 600; min-width: 64px; }
+.mini:disabled { opacity: .35; }
+.inp { width: 100%; padding: 12px 14px; font-size: 16px; border: 1px solid #f0e0c0; border-radius: 12px; background: #fff; outline: none; margin-top: 10px; }
+.inp:focus { border-color: #e8a5a0; }
+.chips { display: flex; gap: 8px; margin-top: 8px; }
+.chips.wrap { flex-wrap: wrap; }
+.chip { flex: 1; padding: 9px 6px; border: 1px solid #f0e0c0; background: #fff; border-radius: 20px; font-size: 13px; color: #9a9490; }
+.chips.wrap .chip { flex: none; padding: 8px 14px; font-size: 12px; }
+.chip.on { border-color: #d4756e; background: rgba(212,117,110,.1); color: #b85a53; font-weight: 600; }
+.pane { padding: 4px 14px 60px; max-width: 640px; margin: 0 auto; }
+
+/* Check-in */
+#v-checkin { padding-bottom: 190px; }
+.stats { display: flex; justify-content: space-between; font-size: 14px; margin: 8px 0 2px; font-weight: 600; }
+#live { font-size: 11px; font-weight: 400; color: #6b8f6b; }
+#live.off { color: #c05c54; }
+.sub { font-size: 12px; color: #9a9490; margin-bottom: 4px; min-height: 16px; }
+.bar { height: 10px; background: #f0e0c0; border-radius: 10px; overflow: hidden; }
+#barFill { height: 100%; width: 0; background: linear-gradient(90deg, #8aab8a, #6b8f6b); transition: width .3s; }
+.filters { padding: 2px 14px 12px; }
+.gh { display: flex; justify-content: space-between; padding: 10px 14px; background: #f9f2e4; font-weight: 700; color: #b85a53; font-size: 14px; }
+.g { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fff; border-bottom: 1px solid #f9f2e4; font-size: 17px; }
+.g .ck { width: 26px; text-align: center; font-size: 20px; color: #c9c2b8; }
+.g .nm { flex: 1; }
+.g .tm { font-size: 12px; color: #6b8f6b; }
+.g.in { background: #eaf3ea; }
+.g.in .ck, .g.in .nm { color: #4f6b4f; }
+.g.sel { background: #fde9e7; outline: 2px solid #d4756e; outline-offset: -2px; }
+.g.sel .ck { color: #b85a53; }
+.note-badge { font-size: 12px; margin-left: 6px; }
+.selbar { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 2px solid #d4756e; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 20px rgba(0,0,0,.08); z-index: 20; }
+.sl { font-size: 15px; line-height: 1.6; margin-bottom: 10px; max-height: 130px; overflow-y: auto; }
+.sl b { color: #b85a53; font-size: 18px; }
+.notebox { background: #fff3cd; border: 2px solid #e0a800; border-radius: 12px; padding: 8px 12px; margin: 4px 0 8px; font-size: 14px; line-height: 1.5; color: #6b4e00; }
+.btns { display: flex; gap: 8px; }
+.btns button { flex: 1; padding: 14px 6px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; }
+.go { background: #6b8f6b; color: #fff; }
+.un { background: #fff; color: #b85a53; border: 2px solid #d4756e !important; }
+.cl { background: #f0e0c0; color: #6b6560; flex: .6 !important; }
+#toast { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 50; background: #4f6b4f; color: #fff; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+#toast.err { background: #c05c54; }
+
+/* Rundown / supplies / contacts */
+.tabs { display: flex; gap: 8px; margin-top: 10px; }
+.tab { flex: 1; padding: 11px 6px; border: 2px solid #f0e0c0; background: #fff; border-radius: 14px; font-size: 15px; color: #9a9490; font-weight: 600; }
+.tab.on { border-color: #d4756e; background: rgba(212,117,110,.1); color: #b85a53; }
+.tab i { font-style: normal; font-size: 12px; background: #e0a800; color: #fff; border-radius: 10px; padding: 1px 7px; margin-left: 6px; }
+.mine-sum { font-size: 13px; color: #b85a53; margin: 12px 0 0; min-height: 18px; font-weight: 600; }
+.tg { display: flex; gap: 10px; margin-top: 14px; }
+.tt { width: 62px; flex: none; font-weight: 700; color: #b85a53; font-size: 15px; padding-top: 12px; line-height: 1.3; word-break: break-word; }
+.tc { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tk, .sp { background: #fff; border: 1px solid #f0e0c0; border-radius: 14px; padding: 12px; }
+.sp { margin-top: 8px; }
+.tk.mine, .sp.mine { background: #fff3cd; border-color: #e0a800; box-shadow: 0 0 0 2px rgba(224,168,0,.25); }
+.tn { font-size: 16px; font-weight: 600; line-height: 1.4; }
+.ow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ob { background: #f9f2e4; color: #6b6560; border-radius: 12px; padding: 3px 10px; font-size: 13px; }
+.ob.mine { background: #d4756e; color: #fff; font-weight: 600; }
+.nt { margin-top: 8px; font-size: 13px; color: #6b6560; background: #fdfaf5; border-radius: 8px; padding: 6px 8px; line-height: 1.5; }
+.tk.mine .nt, .sp.mine .nt { background: rgba(255,255,255,.7); }
+.spt { display: flex; justify-content: space-between; gap: 8px; }
+.qty { color: #6b8f6b; font-weight: 700; white-space: nowrap; }
+.cg { margin-top: 18px; font-weight: 700; color: #b85a53; font-size: 14px; padding: 6px 2px; border-bottom: 2px solid #f0e0c0; }
+.ct { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #f0e0c0; border-radius: 14px; padding: 12px; margin-top: 8px; }
+.ci { flex: 1; min-width: 0; }
+.cn { font-size: 16px; font-weight: 600; }
+.cm { font-size: 12px; color: #9a9490; margin-top: 2px; line-height: 1.4; }
+.call { background: #6b8f6b; color: #fff; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="v-home" class="view">
+  <div class="hero">
+    <p class="h1">吳梁聯婚</p>
+    <p class="h2">Staff Hub · 婚禮當日工作台</p>
+  </div>
+  <div class="tiles">
+    <a class="tile" href="#checkin"><span class="ti">✅</span><b>Check-in</b><small>賓客簽到</small></a>
+    <a class="tile" href="#rundown"><span class="ti">🗓</span><b>Rundown</b><small>流程 · 負責人</small></a>
+    <a class="tile" href="#supplies"><span class="ti">📦</span><b>Supplies</b><small>物資清單</small></a>
+    <a class="tile" href="#contacts"><span class="ti">📞</span><b>Contacts</b><small>供應商聯絡</small></a>
+  </div>
+</div>
+
+<!-- CHECK-IN -->
+<div id="v-checkin" class="view" style="display:none">
+  <div class="top">
+    <div class="row">
+      <a class="back" href="#">← 返回</a>
+      <b>簽到 Check-in</b>
+      <button id="undoBtn" class="mini" onclick="undo()" disabled>↩ Undo</button>
+    </div>
+    <div class="stats"><span id="statTxt">-</span><span id="live">● live</span></div>
+    <div class="sub" id="sideStat"></div>
+    <div class="bar"><div id="barFill"></div></div>
+    <input id="search" class="inp" type="search" placeholder="搜尋姓名或枱號 Search name / table" oninput="renderCheckin()">
+  </div>
+  <div class="filters">
+    <div class="chips" id="statusChips">
+      <button class="chip on" data-f="all">全部 All</button>
+      <button class="chip" data-f="todo">未到 Not yet</button>
+      <button class="chip" data-f="done">已到 Arrived</button>
+    </div>
+    <div class="chips" id="sideChips">
+      <button class="chip on" data-s="all">男女家 All</button>
+      <button class="chip" data-s="groom">🤵 男家</button>
+      <button class="chip" data-s="bride">👰 女家</button>
+    </div>
+    <div class="chips wrap" id="groupChips"></div>
+  </div>
+  <div id="list"></div>
+  <div id="selbar" class="selbar" style="display:none">
+    <div class="sl" id="selList"></div>
+    <div class="btns">
+      <button class="go" id="goBtn" onclick="setSel(1)">✓ Check in 到場</button>
+      <button class="un" id="unBtn" onclick="setSel(0)">✗ 取消到場</button>
+      <button class="cl" onclick="clearSel()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- RUNDOWN -->
+<div id="v-rundown" class="view" style="display:none">
+  <div class="top">
+    <div class="row">
+      <a class="back" href="#">← 返回</a>
+      <b>流程 Rundown</b>
+      <button class="mini" onclick="loadOps(false)">↻</button>
+    </div>
+    <input class="inp myname" type="text" placeholder="輸入你嘅名 → 你嘅任務會亮起 Type your name" oninput="setMyName(this)">
+    <div class="tabs">
+      <button class="tab on" id="tabAm" onclick="setSession('am')">上畫 Morning</button>
+      <button class="tab" id="tabPm" onclick="setSession('pm')">下畫 Afternoon</button>
+    </div>
+    <div class="chips"><button class="chip mineChip" onclick="toggleMine()">⭐ 只睇我嘅 Only mine</button></div>
+  </div>
+  <div class="pane">
+    <p class="mine-sum" id="mineSum"></p>
+    <div id="rdList"></div>
+  </div>
+</div>
+
+<!-- SUPPLIES -->
+<div id="v-supplies" class="view" style="display:none">
+  <div class="top">
+    <div class="row">
+      <a class="back" href="#">← 返回</a>
+      <b>物資 Supplies</b>
+      <button class="mini" onclick="loadOps(false)">↻</button>
+    </div>
+    <input class="inp myname" type="text" placeholder="輸入你嘅名 → 你嘅物資會亮起 Type your name" oninput="setMyName(this)">
+    <input id="spQ" class="inp" type="search" placeholder="搜尋物資 Search" oninput="renderSupplies()">
+    <div class="chips"><button class="chip mineChip" onclick="toggleMine()">⭐ 只睇我嘅 Only mine</button></div>
+  </div>
+  <div class="pane"><div id="spList"></div></div>
+</div>
+
+<!-- CONTACTS -->
+<div id="v-contacts" class="view" style="display:none">
+  <div class="top">
+    <div class="row">
+      <a class="back" href="#">← 返回</a>
+      <b>聯絡 Contacts</b>
+      <button class="mini" onclick="loadOps(false)">↻</button>
+    </div>
+    <input id="ctQ" class="inp" type="search" placeholder="搜尋 Search" oninput="renderContacts()">
+  </div>
+  <div class="pane"><div id="ctList"></div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ▼▼▼ 貼你嘅Apps Script /exec URL ▼▼▼
+var API = 'https://script.google.com/macros/s/AKfycbxKhUs1cPdsNyDjOVbsbeyXgz0Jv-JXb1ebmbV2LEJeEvgZdnTagSMoxdLfsEB2KDNl8w/exec';
+// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+var VIEWS = ['checkin', 'rundown', 'supplies', 'contacts'];
+var guests = [], byRow = {}, selected = {};
+var lastAction = null, busy = false;
+var fStatus = 'all', fSide = 'all', fGroup = 'all';
+var ops = null, myName = '', rdSession = 'am', onlyMine = false;
+var pollTimer = null, toastTimer = null;
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// JSONP: Safari 都work，冇CORS問題
+function jsonp(params) {
+  return new Promise(function (resolve, reject) {
+    if (API.indexOf('PASTE') === 0) { reject(new Error('API url not set')); return; }
+    var cb = 'cb' + Date.now() + Math.floor(Math.random() * 100000);
+    var s = document.createElement('script');
+    var t = setTimeout(function () { cleanup(); reject(new Error('timeout')); }, 20000);
+    function cleanup() {
+      clearTimeout(t);
+      delete window[cb];
+      if (s.parentNode) s.parentNode.removeChild(s);
+    }
+    window[cb] = function (d) { cleanup(); resolve(d); };
+    s.onerror = function () { cleanup(); reject(new Error('network')); };
+    params.callback = cb;
+    params._ = Date.now();
+    s.src = API + '?' + new URLSearchParams(params).toString();
+    document.head.appendChild(s);
+  });
+}
+
+// ───── Routing ─────
+function route() {
+  var v = location.hash.replace('#', '');
+  if (VIEWS.indexOf(v) < 0) v = 'home';
+  document.querySelectorAll('.view').forEach(function (el) {
+    el.style.display = el.id === 'v-' + v ? 'block' : 'none';
+  });
+  clearInterval(pollTimer);
+  pollTimer = null;
+  window.scrollTo(0, 0);
+  if (v === 'checkin') {
+    refresh(true);
+    pollTimer = setInterval(function () { if (!document.hidden) refresh(); }, 8000);
+  } else if (v !== 'home') {
+    if (ops) renderOps();
+    loadOps(true);
+    pollTimer = setInterval(function () { if (!document.hidden) loadOps(true); }, 60000);
+  }
+}
+window.addEventListener('hashchange', route);
+
+// ───── Shared helpers ─────
+function splitOwners(s) {
+  return String(s || '').split(/[,，、;；]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+}
+function isMine(owners) {
+  if (!myName) return false;
+  var q = myName.toLowerCase();
+  return owners.some(function (o) { return o.toLowerCase().indexOf(q) > -1; });
+}
+function showToast(msg, isErr, ms) {
+  var t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = isErr ? 'err' : '';
+  t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.style.display = 'none'; }, ms || (isErr ? 4000 : 5000));
+}
+function hhmm() {
+  var d = new Date();
+  return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+}
+
+// ═════════ CHECK-IN ═════════
+function sideOf(v) {
+  v = String(v || '').toLowerCase();
+  if (v.indexOf('男') > -1 || v.indexOf('groom') > -1) return 'groom';
+  if (v.indexOf('女') > -1 || v.indexOf('bride') > -1) return 'bride';
+  return '';
+}
+
+function setGuests(list) {
+  guests = list;
+  byRow = {};
+  guests.forEach(function (g) { byRow[g.row] = g; });
+  Object.keys(selected).forEach(function (r) { if (!byRow[r]) delete selected[r]; });
+  renderCheckin();
+}
+
+function setLive(ok) {
+  var el = document.getElementById('live');
+  el.textContent = ok ? '● live' : '● offline 離線';
+  el.className = ok ? '' : 'off';
+}
+
+function refresh(first) {
+  if (busy) return;
+  if (first && !guests.length) {
+    document.getElementById('list').innerHTML = '<p class="empty">載入中 Loading...</p>';
+  }
+  jsonp({ action: 'guests' }).then(function (d) {
+    if (busy) return;
+    if (!d.ok) throw new Error(d.error);
+    setGuests(d.guests);
+    setLive(true);
+  }).catch(function (err) {
+    setLive(false);
+    if (!guests.length) {
+      document.getElementById('list').innerHTML =
+        '<p class="empty">連接失敗 Connection failed<br><small>' + esc(err.message) + '</small></p>';
+    }
+  });
+}
+
+function renderCheckin() {
+  var q = document.getElementById('search').value.trim().toLowerCase();
+  var total = guests.length;
+  var done = guests.filter(function (g) { return g.arrived; }).length;
+  var pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('statTxt').textContent = done + ' / ' + total + ' (' + pct + '%) 已到';
+  document.getElementById('barFill').style.width = pct + '%';
+
+  var ss = { groom: { t: 0, d: 0 }, bride: { t: 0, d: 0 } };
+  var ts = {};
+  guests.forEach(function (g) {
+    var s = sideOf(g.side);
+    if (s) { ss[s].t++; if (g.arrived) ss[s].d++; }
+    if (!ts[g.table]) ts[g.table] = { t: 0, d: 0 };
+    ts[g.table].t++;
+    if (g.arrived) ts[g.table].d++;
+  });
+  document.getElementById('sideStat').textContent =
+    (ss.groom.t || ss.bride.t)
+      ? '男家 ' + ss.groom.d + '/' + ss.groom.t + '  ·  女家 ' + ss.bride.d + '/' + ss.bride.t
+      : '';
+
+  // group chips follow the selected side
+  var groups = [];
+  guests.forEach(function (g) {
+    if (fSide !== 'all' && sideOf(g.side) !== fSide) return;
+    if (g.group && groups.indexOf(g.group) < 0) groups.push(g.group);
+  });
+  if (fGroup !== 'all' && groups.indexOf(fGroup) < 0) fGroup = 'all';
+  var gh = '';
+  if (groups.length) {
+    gh = '<button class="chip' + (fGroup === 'all' ? ' on' : '') + '" data-g="all">全部組別</button>';
+    groups.forEach(function (g) {
+      gh += '<button class="chip' + (fGroup === g ? ' on' : '') + '" data-g="' + esc(g) + '">' + esc(g) + '</button>';
+    });
+  }
+  document.getElementById('groupChips').innerHTML = gh;
+  document.querySelectorAll('#statusChips .chip').forEach(function (c) {
+    c.classList.toggle('on', c.getAttribute('data-f') === fStatus);
+  });
+  document.querySelectorAll('#sideChips .chip').forEach(function (c) {
+    c.classList.toggle('on', c.getAttribute('data-s') === fSide);
+  });
+
+  var order = [], byTable = {};
+  guests.forEach(function (g) {
+    if (fStatus === 'todo' && g.arrived) return;
+    if (fStatus === 'done' && !g.arrived) return;
+    if (fSide !== 'all' && sideOf(g.side) !== fSide) return;
+    if (fGroup !== 'all' && g.group !== fGroup) return;
+    if (q && g.name.toLowerCase().indexOf(q) < 0 && g.table.toLowerCase().indexOf(q) < 0) return;
+    if (!byTable[g.table]) { byTable[g.table] = []; order.push(g.table); }
+    byTable[g.table].push(g);
+  });
+
+  var html = '';
+  order.forEach(function (t) {
+    html += '<div class="gh"><span>' + esc(t) + '</span><span>' + ts[t].d + '/' + ts[t].t + '</span></div>';
+    byTable[t].forEach(function (g) {
+      var sel = selected[g.row];
+      html += '<div class="g' + (g.arrived ? ' in' : '') + (sel ? ' sel' : '') + '" data-row="' + g.row + '">' +
+        '<span class="ck">' + (sel ? '☑' : (g.arrived ? '✓' : '○')) + '</span>' +
+        '<span class="nm">' + esc(g.name) + (g.note ? '<span class="note-badge">📝</span>' : '') + '</span>' +
+        '<span class="tm">' + (g.arrived ? esc(g.time) : '') + '</span></div>';
+    });
+  });
+  if (!order.length) html = guests.length ? '<p class="empty">找不到 No results</p>' : document.getElementById('list').innerHTML;
+  document.getElementById('list').innerHTML = html;
+  renderSelBar();
+}
+
+function renderSelBar() {
+  var rows = Object.keys(selected);
+  var bar = document.getElementById('selbar');
+  if (!rows.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  var anyOut = false, anyIn = false, html = '';
+  rows.forEach(function (r) {
+    var g = byRow[r];
+    if (!g) return;
+    if (g.arrived) anyIn = true; else anyOut = true;
+    html += esc(g.name) + ' → <b>' + esc(g.table) + '</b>' + (g.arrived ? ' ✓' : '') + '<br>';
+    if (g.note) html += '<div class="notebox">📝 ' + esc(g.note) + '</div>';
+  });
+  document.getElementById('selList').innerHTML = html;
+  document.getElementById('goBtn').style.display = anyOut ? 'block' : 'none';
+  document.getElementById('unBtn').style.display = anyIn ? 'block' : 'none';
+}
+
+document.getElementById('list').addEventListener('click', function (e) {
+  var el = e.target.closest('.g');
+  if (!el) return;
+  var r = el.getAttribute('data-row');
+  if (selected[r]) delete selected[r]; else selected[r] = true;
+  renderCheckin();
+});
+document.getElementById('statusChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  fStatus = b.getAttribute('data-f'); renderCheckin();
+});
+document.getElementById('sideChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  fSide = b.getAttribute('data-s'); fGroup = 'all'; renderCheckin();
+});
+document.getElementById('groupChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  fGroup = b.getAttribute('data-g'); renderCheckin();
+});
+
+function clearSel() { selected = {}; renderCheckin(); }
+
+function setSel(value) {
+  var rows = Object.keys(selected).filter(function (r) {
+    var g = byRow[r];
+    return g && g.arrived !== !!value;
+  });
+  selected = {};
+  if (!rows.length) { renderCheckin(); return; }
+  apply(rows, value, true, false);
+}
+
+function undo() {
+  if (!lastAction) return;
+  var a = lastAction;
+  apply(a.rows, a.value ? 0 : 1, false, true);
+}
+
+function apply(rows, value, record, isUndo) {
+  var affected = rows.map(function (r) { return byRow[r]; }).filter(Boolean);
+  if (!affected.length) return;
+  var now = hhmm();
+  var summary = affected.map(function (g) { return esc(g.name) + ' → <b>' + esc(g.table) + '</b>'; }).join('<br>');
+  var notes = affected.filter(function (g) { return g.note; })
+    .map(function (g) { return '📝 ' + esc(g.name) + '：' + esc(g.note); }).join('<br>');
+  affected.forEach(function (g) { g.arrived = !!value; g.time = value ? now : ''; });
+  renderCheckin();
+
+  busy = true;
+  jsonp({ action: 'set', rows: rows.join(','), value: String(value) }).then(function (d) {
+    busy = false;
+    if (!d.ok) throw new Error(d.error);
+    setGuests(d.guests);
+    setLive(true);
+    lastAction = record ? { rows: rows, value: value } : null;
+    document.getElementById('undoBtn').disabled = !lastAction;
+    if (isUndo) showToast('↩ 已還原 Undone');
+    else showToast((value ? '✓ 已簽到<br>' : '✗ 已取消<br>') + summary +
+      (value && notes ? '<br><br><b>⚠️ 提醒 Reminder</b><br>' + notes : ''), false, value && notes ? 9000 : 0);
+  }).catch(function () {
+    busy = false;
+    showToast('⚠️ 失敗，已重新載入 Failed, reloading', true);
+    refresh();
+  });
+}
+
+// ═════════ RUNDOWN / SUPPLIES / CONTACTS ═════════
+function setOpsMsg(html) {
+  ['rdList', 'spList', 'ctList'].forEach(function (id) {
+    document.getElementById(id).innerHTML = '<p class="empty">' + html + '</p>';
+  });
+}
+
+function loadOps(silent) {
+  if (!ops) setOpsMsg('載入中 Loading...');
+  jsonp({ action: 'ops' }).then(function (d) {
+    if (!d.ok) {
+      if (!ops) setOpsMsg(d.error === 'SETUP'
+        ? '⚠️ 未建立資料表<br>請先喺Apps Script run <b>setupOps</b>'
+        : '錯誤: ' + esc(d.error));
+      return;
+    }
+    ops = d;
+    renderOps();
+  }).catch(function () {
+    if (!ops) setOpsMsg('連接失敗 Connection failed<br>撳右上 ↻ 再試');
+  });
+}
+
+function renderOps() { renderRundown(); renderSupplies(); renderContacts(); }
+
+function setMyName(src) {
+  myName = src.value.trim();
+  try { localStorage.setItem('staffName', myName); } catch (e) {}
+  document.querySelectorAll('.myname').forEach(function (i) { if (i !== src) i.value = src.value; });
+  renderRundown();
+  renderSupplies();
+}
+
+function toggleMine() {
+  onlyMine = !onlyMine;
+  document.querySelectorAll('.mineChip').forEach(function (c) { c.classList.toggle('on', onlyMine); });
+  renderRundown();
+  renderSupplies();
+}
+
+function setSession(s) {
+  rdSession = s;
+  document.getElementById('tabAm').classList.toggle('on', s === 'am');
+  document.getElementById('tabPm').classList.toggle('on', s === 'pm');
+  renderRundown();
+}
+
+function sessionOf(v) {
+  return /下|pm|afternoon/i.test(String(v || '')) ? 'pm' : 'am';
+}
+
+function ownersHtml(owners) {
+  return owners.length
+    ? '<div class="ow">' + owners.map(function (o) {
+        return '<span class="ob' + (isMine([o]) ? ' mine' : '') + '">' + esc(o) + '</span>';
+      }).join('') + '</div>'
+    : '';
+}
+
+function renderRundown() {
+  if (!ops) return;
+  var items = ops.rundown.map(function (r) {
+    var owners = splitOwners(r[3]);
+    return { s: sessionOf(r[0]), time: r[1], task: r[2], owners: owners, note: r[4], mine: isMine(owners) };
+  });
+  var mc = { am: 0, pm: 0 };
+  items.forEach(function (t) { if (t.mine) mc[t.s]++; });
+  document.getElementById('tabAm').innerHTML = '上畫 Morning' + (mc.am ? '<i>' + mc.am + '</i>' : '');
+  document.getElementById('tabPm').innerHTML = '下畫 Afternoon' + (mc.pm ? '<i>' + mc.pm + '</i>' : '');
+  document.getElementById('mineSum').textContent = myName
+    ? '⭐ ' + myName + ' 共有 ' + (mc.am + mc.pm) + ' 個任務（上畫 ' + mc.am + ' · 下畫 ' + mc.pm + '）'
+    : '';
+
+  var box = document.getElementById('rdList');
+  if (onlyMine && !myName) { box.innerHTML = '<p class="empty">請先喺上面輸入你嘅名<br>Type your name above</p>'; return; }
+  var list = items.filter(function (t) { return t.s === rdSession && (!onlyMine || t.mine); });
+  if (!list.length) { box.innerHTML = '<p class="empty">冇安排 Nothing here</p>'; return; }
+
+  var html = '', last = null, open = false;
+  list.forEach(function (t) {
+    if (!open || t.time !== last) {
+      if (open) html += '</div></div>';
+      html += '<div class="tg"><div class="tt">' + esc(t.time) + '</div><div class="tc">';
+      open = true;
+      last = t.time;
+    }
+    html += '<div class="tk' + (t.mine ? ' mine' : '') + '"><div class="tn">' + esc(t.task) + '</div>' +
+      ownersHtml(t.owners) +
+      (t.note ? '<div class="nt">📦 ' + esc(t.note) + '</div>' : '') + '</div>';
+  });
+  if (open) html += '</div></div>';
+  box.innerHTML = html;
+}
+
+function renderSupplies() {
+  if (!ops) return;
+  var q = document.getElementById('spQ').value.trim().toLowerCase();
+  var box = document.getElementById('spList');
+  if (onlyMine && !myName) { box.innerHTML = '<p class="empty">請先喺上面輸入你嘅名<br>Type your name above</p>'; return; }
+  var html = '';
+  ops.supplies.forEach(function (r) {
+    var owners = splitOwners(r[2]);
+    var mine = isMine(owners);
+    if (onlyMine && !mine) return;
+    if (q && (r[0] + ' ' + r[2] + ' ' + r[3]).toLowerCase().indexOf(q) < 0) return;
+    html += '<div class="sp' + (mine ? ' mine' : '') + '"><div class="spt"><div class="tn">' + esc(r[0]) +
+      '</div><div class="qty">' + (r[1] ? '× ' + esc(r[1]) : '') + '</div></div>' +
+      ownersHtml(owners) +
+      (r[3] ? '<div class="nt">' + esc(r[3]) + '</div>' : '') + '</div>';
+  });
+  box.innerHTML = html || '<p class="empty">找不到 No results</p>';
+}
+
+function renderContacts() {
+  if (!ops) return;
+  var q = document.getElementById('ctQ').value.trim().toLowerCase();
+  var order = [], groups = {};
+  ops.contacts.forEach(function (r) {
+    if (q && r.join(' ').toLowerCase().indexOf(q) < 0) return;
+    var cat = r[0] || '其他';
+    if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+    groups[cat].push(r);
+  });
+  var html = '';
+  order.forEach(function (cat) {
+    html += '<div class="cg">' + esc(cat) + '</div>';
+    groups[cat].forEach(function (r) {
+      var tel = String(r[2] || '').replace(/[^\d+]/g, '');
+      html += '<div class="ct"><div class="ci"><div class="cn">' + esc(r[1]) + '</div>' +
+        (r[3] ? '<div class="cm">' + esc(r[3]) + '</div>' : '') + '</div>' +
+        (tel ? '<a class="call" href="tel:' + tel + '">📞 ' + esc(r[2]) + '</a>' : '') + '</div>';
+    });
+  });
+  document.getElementById('ctList').innerHTML = html || '<p class="empty">找不到 No results</p>';
+}
+
+// ───── Start ─────
+(function () {
+  try {
+    var saved = localStorage.getItem('staffName');
+    if (saved) {
+      myName = saved;
+      document.querySelectorAll('.myname').forEach(function (i) { i.value = saved; });
+    }
+  } catch (e) {}
+  route();
+})();
+</script>
+</body>
+</html>
