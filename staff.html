@@ -47,7 +47,7 @@ a { color: inherit; text-decoration: none; }
 #live.off { color: #c05c54; }
 .sub { font-size: 12px; color: #9a9490; margin-bottom: 4px; min-height: 16px; }
 .bar { height: 10px; background: #f0e0c0; border-radius: 10px; overflow: hidden; }
-#barFill { height: 100%; width: 0; background: linear-gradient(90deg, #8aab8a, #6b8f6b); transition: width .3s; }
+#barFill, #teaBar { height: 100%; width: 0; background: linear-gradient(90deg, #8aab8a, #6b8f6b); transition: width .3s; }
 .filters { padding: 2px 14px 12px; }
 .gh { display: flex; justify-content: space-between; padding: 10px 14px; background: #f9f2e4; font-weight: 700; color: #b85a53; font-size: 14px; }
 .g { display: flex; align-items: center; gap: 12px; padding: 14px; background: #fff; border-bottom: 1px solid #f9f2e4; font-size: 17px; }
@@ -68,7 +68,7 @@ a { color: inherit; text-decoration: none; }
 .go { background: #6b8f6b; color: #fff; }
 .un { background: #fff; color: #b85a53; border: 2px solid #d4756e !important; }
 .cl { background: #f0e0c0; color: #6b6560; flex: .6 !important; }
-#toast { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 50; background: #4f6b4f; color: #fff; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+#toast { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 100; background: #4f6b4f; color: #fff; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
 #toast.err { background: #c05c54; }
 
 /* Rundown / supplies / contacts */
@@ -97,6 +97,34 @@ a { color: inherit; text-decoration: none; }
 .cn { font-size: 16px; font-weight: 600; }
 .cm { font-size: 12px; color: #9a9490; margin-top: 2px; line-height: 1.4; }
 .call { background: #6b8f6b; color: #fff; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+
+.tile.wide { grid-column: 1 / -1; }
+
+/* Tea */
+.tstat { font-size: 14px; font-weight: 600; margin: 8px 0 2px; }
+.tsec { display: flex; justify-content: space-between; padding: 10px 14px; background: #f9f2e4; font-weight: 700; color: #b85a53; font-size: 14px; margin-top: 10px; }
+.tr { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border-bottom: 1px solid #f9f2e4; }
+.tr.in { background: #eaf3ea; }
+.tck { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #d4756e; background: #fff; color: #d4756e; font-size: 20px; flex: none; }
+.tr.in .tck { background: #6b8f6b; border-color: #6b8f6b; color: #fff; }
+.tbody { flex: 1; min-width: 0; }
+.tnm2 { font-size: 17px; font-weight: 600; }
+.bd { font-size: 14px; margin-left: 6px; }
+.trm { font-size: 12px; color: #6b6560; margin-top: 3px; line-height: 1.4; }
+.shbg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.4); z-index: 60; }
+.shbox { position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; background: #fff; border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); max-height: 88vh; overflow-y: auto; box-shadow: 0 -10px 30px rgba(0,0,0,.2); }
+.shh { font-size: 18px; font-weight: 700; color: #b85a53; margin-bottom: 12px; }
+.tg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.tgl { padding: 14px 4px; border: 2px solid #f0e0c0; background: #fdfaf5; border-radius: 14px; font-size: 14px; color: #9a9490; font-weight: 600; line-height: 1.5; }
+.tgl.on { border-color: #6b8f6b; background: #eaf3ea; color: #4f6b4f; }
+.seg { display: flex; gap: 8px; margin-top: 12px; }
+.seg button { flex: 1; padding: 11px 6px; border: 2px solid #f0e0c0; background: #fff; border-radius: 12px; font-size: 14px; color: #9a9490; font-weight: 600; }
+.seg button.on { border-color: #d4756e; background: rgba(212,117,110,.1); color: #b85a53; }
+.shl { font-size: 12px; color: #4f6b4f; margin-top: 14px; }
+.shbtns { display: flex; gap: 8px; margin-top: 16px; }
+.shbtns button { flex: 1; padding: 14px 6px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; }
+.shbtns .ok { background: #6b8f6b; color: #fff; }
+.shbtns .no { background: #f0e0c0; color: #6b6560; flex: .6; }
 </style>
 </head>
 <body>
@@ -109,9 +137,10 @@ a { color: inherit; text-decoration: none; }
   </div>
   <div class="tiles">
     <a class="tile" href="#checkin"><span class="ti">✅</span><b>Check-in</b><small>賓客簽到</small></a>
+    <a class="tile" href="#tea"><span class="ti">🍵</span><b>敬茶 Tea</b><small>利是 · 金器</small></a>
     <a class="tile" href="#rundown"><span class="ti">🗓</span><b>Rundown</b><small>流程 · 負責人</small></a>
     <a class="tile" href="#supplies"><span class="ti">📦</span><b>Supplies</b><small>物資清單</small></a>
-    <a class="tile" href="#contacts"><span class="ti">📞</span><b>Contacts</b><small>供應商聯絡</small></a>
+    <a class="tile wide" href="#contacts"><span class="ti">📞</span><b>Contacts</b><small>供應商聯絡</small></a>
   </div>
 </div>
 
@@ -151,6 +180,40 @@ a { color: inherit; text-decoration: none; }
     </div>
   </div>
 </div>
+
+<!-- TEA -->
+<div id="v-tea" class="view" style="display:none">
+  <div class="top">
+    <div class="row">
+      <a class="back" href="#">← 返回</a>
+      <b>敬茶 Tea</b>
+      <button class="mini" onclick="openAdd()">＋ 加人</button>
+    </div>
+    <div class="tstat" id="teaStat">-</div>
+    <div class="sub" id="teaSub"></div>
+    <div class="bar"><div id="teaBar"></div></div>
+    <input id="teaQ" class="inp" type="search" placeholder="搜尋稱呼或備註 Search" oninput="renderTea()">
+  </div>
+  <div class="filters">
+    <div class="chips" id="tSideChips">
+      <button class="chip on" data-s="all">男女家 All</button>
+      <button class="chip" data-s="groom">🤵 男家</button>
+      <button class="chip" data-s="bride">👰 女家</button>
+    </div>
+    <div class="chips" id="tSessChips">
+      <button class="chip on" data-x="all">全日 All</button>
+      <button class="chip" data-x="am">上畫</button>
+      <button class="chip" data-x="pm">下畫</button>
+    </div>
+    <div class="chips" id="tStatChips">
+      <button class="chip on" data-f="all">全部</button>
+      <button class="chip" data-f="todo">未敬茶</button>
+      <button class="chip" data-f="done">已敬茶</button>
+    </div>
+  </div>
+  <div id="teaList"></div>
+</div>
+<div id="sheet" style="display:none"></div>
 
 <!-- RUNDOWN -->
 <div id="v-rundown" class="view" style="display:none">
@@ -205,10 +268,10 @@ a { color: inherit; text-decoration: none; }
 
 <script>
 // ▼▼▼ 貼你嘅Apps Script /exec URL ▼▼▼
-var API = 'https://script.google.com/macros/s/AKfycbxKhUs1cPdsNyDjOVbsbeyXgz0Jv-JXb1ebmbV2LEJeEvgZdnTagSMoxdLfsEB2KDNl8w/exec';
+var API = 'PASTE_YOUR_EXEC_URL_HERE';
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-var VIEWS = ['checkin', 'rundown', 'supplies', 'contacts'];
+var VIEWS = ['checkin', 'tea', 'rundown', 'supplies', 'contacts'];
 var guests = [], byRow = {}, selected = {};
 var lastAction = null, busy = false;
 var fStatus = 'all', fSide = 'all', fGroup = 'all';
@@ -251,8 +314,12 @@ function route() {
   });
   clearInterval(pollTimer);
   pollTimer = null;
+  closeSheet();
   window.scrollTo(0, 0);
-  if (v === 'checkin') {
+  if (v === 'tea') {
+    refreshTea(true);
+    pollTimer = setInterval(function () { if (!document.hidden) refreshTea(); }, 8000);
+  } else if (v === 'checkin') {
     refresh(true);
     pollTimer = setInterval(function () { if (!document.hidden) refresh(); }, 8000);
   } else if (v !== 'home') {
@@ -480,6 +547,260 @@ function apply(rows, value, record, isUndo) {
     refresh();
   });
 }
+
+// ═════════ TEA 敬茶 ═════════
+var LABELS = ['龍鳳鐲', '金鏈', '金戒指', '玉鐲', '現金利是'];   // ← 快捷標籤，可自己改
+var tea = [], teaByRow = {};
+var tSide = 'all', tSess = 'all', tStat = 'all';
+var teaBusy = 0, teaLoaded = false, ed = null, ad = null;
+
+function teaSet(list) {
+  tea = list;
+  teaByRow = {};
+  tea.forEach(function (t) { teaByRow[t.row] = t; });
+  teaLoaded = true;
+  renderTea();
+}
+
+function refreshTea(first) {
+  if (teaBusy) return;
+  if (first && !teaLoaded) document.getElementById('teaList').innerHTML = '<p class="empty">載入中 Loading...</p>';
+  jsonp({ action: 'tea' }).then(function (d) {
+    if (teaBusy) return;
+    if (!d.ok) throw new Error(d.error);
+    teaSet(d.tea);
+  }).catch(function (err) {
+    if (!teaLoaded) {
+      document.getElementById('teaList').innerHTML = String(err.message).indexOf('SETUP') > -1
+        ? '<p class="empty">⚠️ 未建立資料表<br>請先喺Apps Script run <b>setupOps</b></p>'
+        : '<p class="empty">連接失敗 Connection failed<br><small>' + esc(err.message) + '</small></p>';
+    }
+  });
+}
+
+function renderTea() {
+  var q = document.getElementById('teaQ').value.trim().toLowerCase();
+  var total = tea.length, served = 0, lai = 0, gold = 0;
+  var ss = { groom: { t: 0, d: 0 }, bride: { t: 0, d: 0 } };
+  tea.forEach(function (t) {
+    if (t.served) served++;
+    if (t.lai) lai++;
+    if (t.gold) gold++;
+    var s = sideOf(t.side);
+    if (s) { ss[s].t++; if (t.served) ss[s].d++; }
+  });
+  document.getElementById('teaStat').textContent =
+    '🍵 ' + served + '/' + total + ' 已敬  ·  🧧 ' + lai + ' 利是  ·  🪙 ' + gold + ' 金器';
+  document.getElementById('teaSub').textContent =
+    '🤵 男家 ' + ss.groom.d + '/' + ss.groom.t + '  ·  👰 女家 ' + ss.bride.d + '/' + ss.bride.t;
+  document.getElementById('teaBar').style.width = (total ? Math.round(served / total * 100) : 0) + '%';
+
+  [['tSideChips', 's', tSide], ['tSessChips', 'x', tSess], ['tStatChips', 'f', tStat]].forEach(function (c) {
+    document.querySelectorAll('#' + c[0] + ' .chip').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-' + c[1]) === c[2]);
+    });
+  });
+
+  var groups = {};
+  tea.forEach(function (t) {
+    var s = sideOf(t.side), x = sessionOf(t.session);
+    if (tSide !== 'all' && s !== tSide) return;
+    if (tSess !== 'all' && x !== tSess) return;
+    if (tStat === 'todo' && t.served) return;
+    if (tStat === 'done' && !t.served) return;
+    if (q && (t.name + ' ' + t.remark).toLowerCase().indexOf(q) < 0) return;
+    var key = s + '|' + x;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(t);
+  });
+
+  var names = { groom: '🤵 男家', bride: '👰 女家', '': '其他' };
+  var html = '';
+  ['groom|am', 'groom|pm', 'bride|am', 'bride|pm', '|am', '|pm'].forEach(function (key) {
+    var list = groups[key];
+    if (!list) return;
+    var parts = key.split('|');
+    var d = list.filter(function (t) { return t.served; }).length;
+    html += '<div class="tsec"><span>' + names[parts[0]] + ' · ' + (parts[1] === 'pm' ? '下畫' : '上畫') +
+      '</span><span>' + d + '/' + list.length + '</span></div>';
+    list.forEach(function (t) {
+      var rm = [];
+      if (t.remark) rm.push(esc(t.remark));
+      if (t.served && t.time) rm.push('🍵 ' + esc(t.time));
+      html += '<div class="tr' + (t.served ? ' in' : '') + '" data-row="' + t.row + '">' +
+        '<button class="tck">' + (t.served ? '✓' : '○') + '</button>' +
+        '<div class="tbody"><div class="tnm2">' + esc(t.name) +
+        (t.lai ? '<span class="bd">🧧</span>' : '') + (t.gold ? '<span class="bd">🪙</span>' : '') + '</div>' +
+        (rm.length ? '<div class="trm">' + rm.join(' · ') + '</div>' : '') + '</div></div>';
+    });
+  });
+  if (!html) {
+    html = !teaLoaded ? document.getElementById('teaList').innerHTML
+      : (total ? '<p class="empty">找不到 No results</p>'
+        : '<p class="empty">未有名單<br>去 Day-of Ops Sheet 嘅 <b>Tea</b> 頁填，<br>或者撳右上 ＋ 加人</p>');
+  }
+  document.getElementById('teaList').innerHTML = html;
+}
+
+document.getElementById('teaList').addEventListener('click', function (e) {
+  var el = e.target.closest('.tr');
+  if (!el) return;
+  var row = el.getAttribute('data-row');
+  var t = teaByRow[row];
+  if (!t) return;
+  if (e.target.closest('.tck')) teaPatch(row, { served: t.served ? 0 : 1 });
+  else openEdit(row);
+});
+document.getElementById('tSideChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  tSide = b.getAttribute('data-s'); renderTea();
+});
+document.getElementById('tSessChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  tSess = b.getAttribute('data-x'); renderTea();
+});
+document.getElementById('tStatChips').addEventListener('click', function (e) {
+  var b = e.target.closest('.chip'); if (!b) return;
+  tStat = b.getAttribute('data-f'); renderTea();
+});
+
+function teaPatch(row, f) {
+  var t = teaByRow[row];
+  if (!t) return;
+  var name = t.name;
+  if ('served' in f) { t.served = !!f.served; t.time = f.served ? hhmm() : ''; }
+  if ('lai' in f) t.lai = !!f.lai;
+  if ('gold' in f) t.gold = !!f.gold;
+  if ('session' in f) t.session = f.session === 'pm' ? '下畫' : '上畫';
+  if ('remark' in f) t.remark = f.remark;
+  renderTea();
+
+  var params = { action: 'teaset', row: row };
+  Object.keys(f).forEach(function (k) { params[k] = f[k]; });
+  teaBusy++;
+  jsonp(params).then(function (d) {
+    teaBusy--;
+    if (!d.ok) throw new Error(d.error);
+    teaSet(d.tea);
+    showToast('✓ 已儲存 Saved<br>' + esc(name));
+  }).catch(function () {
+    teaBusy--;
+    showToast('⚠️ 失敗，已重新載入 Failed, reloading', true);
+    refreshTea();
+  });
+}
+
+// ----- bottom sheet (edit / add) -----
+function closeSheet() {
+  ed = null;
+  ad = null;
+  var el = document.getElementById('sheet');
+  el.style.display = 'none';
+  el.innerHTML = '';
+}
+
+function segHtml(act, items, cur) {
+  return '<div class="seg">' + items.map(function (i) {
+    return '<button data-act="' + act + '" data-v="' + i[0] + '" class="' + (cur === i[0] ? 'on' : '') + '">' + i[1] + '</button>';
+  }).join('') + '</div>';
+}
+
+function openEdit(row) {
+  var t = teaByRow[row];
+  if (!t) return;
+  ed = { row: row, orig: { served: t.served, lai: t.lai, gold: t.gold, session: sessionOf(t.session), remark: t.remark } };
+  ed.cur = { served: t.served, lai: t.lai, gold: t.gold, session: ed.orig.session, remark: t.remark };
+  var labels = LABELS.map(function (l, i) {
+    return '<button class="chip" data-act="label" data-i="' + i + '">' + esc(l) + '</button>';
+  }).join('');
+  var side = sideOf(t.side) === 'groom' ? '🤵 男家' : (sideOf(t.side) === 'bride' ? '👰 女家' : '');
+  var el = document.getElementById('sheet');
+  el.innerHTML = '<div class="shbg" data-act="close"></div><div class="shbox">' +
+    '<div class="shh">' + esc(t.name) + (side ? ' · ' + side : '') + '</div>' +
+    '<div class="tg3">' +
+      '<button class="tgl' + (t.served ? ' on' : '') + '" data-act="tgl" data-k="served">🍵<br>已敬茶' + (t.served && t.time ? '<br><small>' + esc(t.time) + '</small>' : '') + '</button>' +
+      '<button class="tgl' + (t.lai ? ' on' : '') + '" data-act="tgl" data-k="lai">🧧<br>有利是</button>' +
+      '<button class="tgl' + (t.gold ? ' on' : '') + '" data-act="tgl" data-k="gold">🪙<br>有金器</button>' +
+    '</div>' +
+    segHtml('sess', [['am', '上畫'], ['pm', '下畫']], ed.orig.session) +
+    '<div class="shl">備註 Remarks（例：龍鳳鐲 / 利是 $1000）</div>' +
+    '<input id="edRemark" class="inp" type="text" maxlength="200" value="' + esc(t.remark) + '" oninput="ed && (ed.cur.remark = this.value)">' +
+    '<div class="chips wrap" style="margin-top:8px">' + labels + '</div>' +
+    '<div class="shbtns"><button class="no" data-act="close">取消</button><button class="ok" data-act="save">儲存 Save</button></div>' +
+    '</div>';
+  el.style.display = 'block';
+}
+
+function openAdd() {
+  ed = null;
+  ad = { side: tSide === 'bride' ? 'bride' : 'groom', session: tSess === 'pm' ? 'pm' : 'am' };
+  var el = document.getElementById('sheet');
+  el.innerHTML = '<div class="shbg" data-act="close"></div><div class="shbox">' +
+    '<div class="shh">＋ 加人 Add</div>' +
+    segHtml('aside', [['groom', '🤵 男家'], ['bride', '👰 女家']], ad.side) +
+    segHtml('asess', [['am', '上畫'], ['pm', '下畫']], ad.session) +
+    '<div class="shl">稱呼 Name（例：大姨媽 陳美麗）</div>' +
+    '<input id="adName" class="inp" type="text" maxlength="50">' +
+    '<div class="shbtns"><button class="no" data-act="close">取消</button><button class="ok" data-act="add">加入 Add</button></div>' +
+    '</div>';
+  el.style.display = 'block';
+}
+
+function saveEdit() {
+  if (!ed) return;
+  var o = ed.orig, c = ed.cur, f = {};
+  if (c.served !== o.served) f.served = c.served ? 1 : 0;
+  if (c.lai !== o.lai) f.lai = c.lai ? 1 : 0;
+  if (c.gold !== o.gold) f.gold = c.gold ? 1 : 0;
+  if (c.session !== o.session) f.session = c.session;
+  if (c.remark !== o.remark) f.remark = c.remark;
+  var row = ed.row;
+  closeSheet();
+  if (Object.keys(f).length) teaPatch(row, f);
+}
+
+function saveAdd() {
+  var name = document.getElementById('adName').value.trim();
+  if (!name) { showToast('請輸入稱呼 Enter a name', true); return; }
+  var a = ad;
+  closeSheet();
+  teaBusy++;
+  jsonp({ action: 'teaadd', side: a.side, session: a.session, name: name }).then(function (d) {
+    teaBusy--;
+    if (!d.ok) throw new Error(d.error);
+    teaSet(d.tea);
+    showToast('✓ 已加入 Added<br>' + esc(name));
+  }).catch(function () {
+    teaBusy--;
+    showToast('⚠️ 失敗 Failed', true);
+    refreshTea();
+  });
+}
+
+document.getElementById('sheet').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-act]');
+  if (!b) return;
+  var a = b.getAttribute('data-act');
+  function pick() {
+    b.parentNode.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+  }
+  if (a === 'close') closeSheet();
+  else if (a === 'save') saveEdit();
+  else if (a === 'add') saveAdd();
+  else if (a === 'tgl' && ed) {
+    var k = b.getAttribute('data-k');
+    ed.cur[k] = !ed.cur[k];
+    b.classList.toggle('on', ed.cur[k]);
+  } else if (a === 'sess' && ed) { ed.cur.session = b.getAttribute('data-v'); pick(); }
+  else if (a === 'aside' && ad) { ad.side = b.getAttribute('data-v'); pick(); }
+  else if (a === 'asess' && ad) { ad.session = b.getAttribute('data-v'); pick(); }
+  else if (a === 'label' && ed) {
+    var inp = document.getElementById('edRemark');
+    var l = LABELS[Number(b.getAttribute('data-i'))];
+    inp.value = inp.value ? inp.value + '、' + l : l;
+    ed.cur.remark = inp.value;
+  }
+});
 
 // ═════════ RUNDOWN / SUPPLIES / CONTACTS ═════════
 function setOpsMsg(html) {
