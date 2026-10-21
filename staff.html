@@ -723,7 +723,7 @@ function openEdit(row) {
       '<button class="tgl' + (t.gold ? ' on' : '') + '" data-act="tgl" data-k="gold">🪙<br>有金器</button>' +
     '</div>' +
     segHtml('sess', [['am', '上畫'], ['pm', '下畫']], ed.orig.session) +
-    '<div class="shl">備註 Remarks（例：龍鳳鐲 / 利是 $1000）</div>' +
+    '<div class="shl">備註 Remarks（例：龍鳳鐲 / 利是 / Label Name ）</div>' +
     '<input id="edRemark" class="inp" type="text" maxlength="200" value="' + esc(t.remark) + '" oninput="ed && (ed.cur.remark = this.value)">' +
     '<div class="chips wrap" style="margin-top:8px">' + labels + '</div>' +
     '<div class="shbtns"><button class="no" data-act="close">取消</button><button class="ok" data-act="save">儲存 Save</button></div>' +
@@ -739,7 +739,7 @@ function openAdd() {
     '<div class="shh">＋ 加人 Add</div>' +
     segHtml('aside', [['groom', '🤵 男家'], ['bride', '👰 女家']], ad.side) +
     segHtml('asess', [['am', '上畫'], ['pm', '下畫']], ad.session) +
-    '<div class="shl">稱呼 Name（例：大姨媽 陳美麗）</div>' +
+    '<div class="shl">稱呼 Name（例：男家媽媽）</div>' +
     '<input id="adName" class="inp" type="text" maxlength="50">' +
     '<div class="shbtns"><button class="no" data-act="close">取消</button><button class="ok" data-act="add">加入 Add</button></div>' +
     '</div>';
